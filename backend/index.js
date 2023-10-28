@@ -4,7 +4,7 @@ const cors=require("cors")
 const multer=require('multer')
 const fs = require('fs')
 const ExifParser = require('exif-parser')
-const {UserModel,FormModel}=require('./models/User')
+const {UserModel,FormModel,UpdateModel}=require('./models/User')
 const app=express()
 app.use(express.json())
 app.use(cors())
@@ -17,6 +17,42 @@ const geocoderOptions = {
 }
 const geocoder=  NodeGeocoder(geocoderOptions)
 
+const {trainModel, predictDepartment}=require('./complaintClassifier.js')
+  trainModel()
+
+  
+  app.get('/form', async (req, res) => {
+    try {
+      const complaints = await FormModel.find({}).exec();
+      res.json(complaints);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while fetching complaints.' });
+    }
+  })
+
+  app.get('/complaints/:complaintId/image', async (req, res) => {
+    const { complaintId } = req.params;
+  
+    try {
+      // Use async/await to fetch the complaint
+      const complaint = await FormModel.findById(complaintId).exec();
+  
+      if (!complaint || !complaint.file) {
+        return res.status(404).send('Complaint not found or no file attached.');
+      }
+  
+      // Send the binary data as an image
+      res.contentType('image/jpeg'); // Adjust the content type as per your actual data type
+      res.send(complaint.file);
+    } catch (error) {
+      // Handle errors
+      console.error(error);
+      res.status(500).send('Error fetching the complaint');
+    }
+  });
+  
+  
 
 app.post('/login',(req,res)=>{
     const{email,password}=req.body;
@@ -24,7 +60,7 @@ app.post('/login',(req,res)=>{
     .then(user=>{
         if(user){
             if(user.password === password){
-                res.json("Success")
+                res.json({status:'Success',userId:user._id})
             }else{
                 res.json("the password is incorrect")
                 
@@ -34,6 +70,13 @@ app.post('/login',(req,res)=>{
         }
     })
 })
+
+
+  
+
+
+
+
 app.post('/', (req, res) => {
     const { email } = req.body;
 
@@ -62,9 +105,19 @@ app.post('/', (req, res) => {
       });
 
       const upload = multer({storage:storage})
+
+      app.post('/classify', upload.single('complaintFile'), (req, res) => {
+        const { complaintText } = req.body;
+      
+        // Use the complaintClassifier to predict the department
+        const department = predictDepartment(complaintText);
+      
+        res.json({ department }); // Return the department as a response
+      });
+    
       
 app.post('/form',upload.single('complaintFile'), (req, res) => {
-    const { complaintText, date, department } = req.body;
+    const { userId,complaintText, date, department } = req.body;
     const file = req.file;
     const fileData = fs.readFileSync(file.path)
     const buffer = new Buffer.from(fileData)
@@ -79,18 +132,31 @@ app.post('/form',upload.single('complaintFile'), (req, res) => {
     const city = result[0].city||'Unknown'
     const location = latitude+','+longitude+','+city
 
-    FormModel.create({ complaintText, date, department, file: buffer, location })
+    FormModel.create({ userId,complaintText, date, department, file: buffer, location })
      .then(complaints=>res.json(complaints))
      .catch(err=>res.json(err))
 })
 .catch(err => res.json(err))
 
-})   
-        
+})  
+
+
+app.post('/updateModal',upload.single('file'), (req, res) => {
+  const { complaintID,userId,actionDescription, status } = req.body;
+  const file = req.file;
+  const fileData = fs.readFileSync(file.path)
+  const buffer = new Buffer.from(fileData)
+  UpdateModel.create({ complaintID,userId,actionDescription, file: buffer, status })
+   .then(actions=>res.json(actions))
+   .catch(err=>res.json(err))
+})
+
+
+
+  
 app.listen(3001,()=>{
     console.log("server is running")
 })
-
 
 
 
