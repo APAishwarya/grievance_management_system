@@ -20,8 +20,17 @@
     padding: 20px;
     width: 80%;
     max-width: 400px;
+    font-weight:bold;
   }
+
   
+  .id {
+    font-weight: bold;
+  }
+  .id input{
+    width:100%;
+    color:#0056b3;
+  }
   /* Headings */
   h2 {
     font-size: 1.5rem;

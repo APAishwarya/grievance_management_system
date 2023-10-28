@@ -6,49 +6,57 @@ import axios from "axios"
 import {useNavigate} from "react-router-dom"
 Modal.setAppElement('#root');
 
-const Form = ({isOpen, toggleModal}) => {
+const Form = ({isOpen, toggleModal,userId}) => {
   const [complaintText, setComplaintText] = useState('');
   const [date, setDate] = useState('');
- // const [department, setDepartment] = useState('');
+  //const [department, setDepartment] = useState('');
   const [file, setFile] = useState(null);
   const navigate = useNavigate()
 
+  
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
 
-    const determineDepartment=(complaintText)=>{
-    if (complaintText.toLowerCase().includes('electricity')) {
-        return 'Electricity Department';
-      }
-        if (complaintText.toLowerCase().includes('health')) {
-          return 'Health Department';
-      }
-      if (complaintText.toLowerCase().includes('sewage','waste','civic')) {
-        return 'Muncipal cooperation';
-    } 
-    if (complaintText.toLowerCase().includes('maintainance','public')) {
-      return 'public work department';
-  }
-  if (complaintText.toLowerCase().includes('water')) {
-    return 'water department';
-}
-if (complaintText.toLowerCase().includes('school','education')) {
-  return 'Education department';
-}
-    else {
-        // Default department if no match is found
-        return 'General Department';
-      }
-    };
+//     const determineDepartment=(complaintText)=>{
+//     if (complaintText.toLowerCase().includes('electricity')) {
+//         return 'Electricity Department';
+//       }
+//         if (complaintText.toLowerCase().includes('health')) {
+//           return 'Health Department';
+//       }
+//       if (complaintText.toLowerCase().includes('sewage','waste','civic')) {
+//         return 'Muncipal cooperation';
+//     } 
+//     if (complaintText.toLowerCase().includes('maintainance','public')) {
+//       return 'public work department';
+//   }
+//   if (complaintText.toLowerCase().includes('water')) {
+//     return 'water department';
+// }
+// if (complaintText.toLowerCase().includes('school','education')) {
+//   return 'Education department';
+// }
+//     else {
+//         // Default department if no match is found
+//         return 'General Department';
+//       }
+//     };
 
 
     const formData = new FormData();
     formData.append('complaintText',complaintText);
     formData.append('date',date);
-    const department=determineDepartment(complaintText)
-    formData.append('department',department);
+    //const department=determineDepartment(complaintText)
+    //formData.append('department',department);
     formData.append('complaintFile',file);
+    formData.append('userId',userId)
+
+    axios.post('http://localhost:3001/classify', formData)
+    .then(result => {
+      const department = result.data.department; // Extract the department from the response
+      console.log('Department:', department);
+      formData.append('department', department);
     // Handle form submission here
         axios.post('http://localhost:3001/form',formData)
         .then(result=>{
@@ -60,7 +68,9 @@ if (complaintText.toLowerCase().includes('school','education')) {
         .catch(err=>console.error('Error:',err))
     
     toggleModal(); // Close the modal after submission
-  };
+  })
+  .catch(err=>console.error('Error:',err))
+}
   return (
     <>
     

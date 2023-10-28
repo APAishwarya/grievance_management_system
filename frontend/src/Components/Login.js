@@ -2,8 +2,11 @@ import React from 'react'
 import {useState} from "react"
 import axios from "axios"
 import {useNavigate} from "react-router-dom"
+//import Employee from './Employee'
 
 //import { Link } from 'react-router-dom'
+
+  
 
 const Login = () => {
     
@@ -11,17 +14,37 @@ const Login = () => {
     const [password, setPassword]= useState()
     const [loginError, setLoginError]=useState()
     const navigate = useNavigate()
+    
+    //const [userID, setUserID]= useState('');
+
 
     const handleSubmit =(e)=>{
         e.preventDefault()
         axios.post('http://localhost:3001/login',{email,password})
         .then(result=>{
             //console.log(result)
-            if(result.data === "Success"){
-                if(email.endsWith('@mcc.gov.in')){
-                    navigate('/employee')
-                }else{
-                navigate('/home')
+            if(result.data.status === "Success"){
+                    const userId= result.data.userId
+                    //setUserID(result.data.userID);
+                    if(email.endsWith('@health.gov.in')){
+                        navigate(`/employee/Health?userId=${userId}`)
+                    }else if(email.endsWith('@electricity.gov.in')){
+                        navigate(`/employee/Electricity?userId=${userId}`)
+                    }
+                    else if(email.endsWith('@wrd.gov.in')){
+                        navigate(`/employee/Water Resources?userId=${userId}`)
+                    }
+                    else if(email.endsWith('@pwd.gov.in')){
+                        navigate(`/employee/Public Works?userId=${userId}`)
+                    }
+                    else if(email.endsWith('@mcd.gov.in')){
+                        navigate(`/employee/Municipal Corporation?userId=${userId}`)
+                    }else if(email.endsWith('@edu.gov.in')){
+                        navigate(`/employee/Education?userId=${userId}`)
+                    }
+
+                else{
+                navigate(`/home?userId=${userId}`)
                 }
             }else{
                 setLoginError("Incorrect email or password.Please try again!")
@@ -61,13 +84,18 @@ const Login = () => {
                             onChange={(e)=> setPassword(e.target.value)}
                         />
                     </div>
+                    
                     <button type="submit" className="btn btn-success w-100 rounded-0">
                         Login
                     </button>
+                    
                     </form>
                    {loginError && <p className="text-danger">{loginError}</p>} 
+
+                   
                 
             </div>
+
         </div>
     </>
   )

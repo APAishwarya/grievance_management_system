@@ -1,11 +1,13 @@
 import React from 'react'
 import {useState} from "react"
-import { Link } from 'react-router-dom'
+import { Link,useLocation } from 'react-router-dom'
 import "./Home.css"
 import Form from './Form'
 
 const Home = () => {
   const [isComplaintModalOpen, setComplaintModalOpen] = useState(false);
+  const location = useLocation()
+  const userId= new URLSearchParams(location.search).get('userId')
 
   const toggleComplaintModal = () => {
     setComplaintModalOpen(!isComplaintModalOpen);
@@ -26,6 +28,7 @@ const Home = () => {
 <Form
         isOpen={isComplaintModalOpen}
         toggleModal={toggleComplaintModal}
+        userId={userId}
       />
     </>
   )

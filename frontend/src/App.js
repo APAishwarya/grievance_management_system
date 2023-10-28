@@ -5,9 +5,11 @@ import Signup from './Components/Signup'
 import Login from './Components/Login'
 import Home from './Components/Home'
 import Employee from './Components/Employee'
+
 //import Form from './Components/Form'
 
 function App(){
+  
   return (
     <>
     <BrowserRouter>
@@ -15,14 +17,9 @@ function App(){
       <Route path="/" element={<Signup />} />
       <Route path="/login" element={<Login/>}/>
       <Route path="/home" element={<Home/>}/>
-      <Route path='/employee' element={<Employee/>}/>
-      {/* <Route path='/*' element={<Navigate to="/register"/>}/>  */}
-
-    
-      
-
-      </Routes>
-      </BrowserRouter>
+      <Route path="/employee/:department" element={<Employee/>}/>
+    </Routes>
+    </BrowserRouter>
     
     </>
   )
