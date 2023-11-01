@@ -31,6 +31,27 @@ const {trainModel, predictDepartment}=require('./complaintClassifier.js')
     }
   })
 
+  app.get('/updates/:complaintID', async (req, res) => {
+    const { complaintID } = req.params;
+  
+    try {
+      // Fetch the corresponding update (equivalent to action) based on complaintId
+      const update = await UpdateModel.findOne({ complaintID: complaintID }).exec();
+  
+      if (update) {
+        res.json(update);
+      } else {
+        res.json({ status: "In Progress", actionDescription: "Action Not Taken" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching updates.' });
+    }
+  });
+  
+
+  
+
   app.get('/complaints/:complaintId/image', async (req, res) => {
     const { complaintId } = req.params;
   
@@ -139,6 +160,7 @@ app.post('/form',upload.single('complaintFile'), (req, res) => {
 .catch(err => res.json(err))
 
 })  
+
 
 
 app.post('/updateModal',upload.single('file'), (req, res) => {

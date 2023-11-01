@@ -12,7 +12,8 @@ const FormSchema = new mongoose.Schema({
     date:String,
     department:String,
     file:Buffer,
-    location:String
+    location:String,
+    
     
 })
 
