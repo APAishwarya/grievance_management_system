@@ -30,10 +30,23 @@ const UpdateModal = ({isOpen, toggleModal, complaintID,userId}) => {
             
         console.log('Response:',result.data)
         // navigate("/employee/:department")
-
+        
+      
             
         })
         .catch(err=>console.error('Error:',err))
+
+        axios.get(`http://localhost:3001/updates/${complaintID}`)
+    .then((updateResponse) => {
+      // If there is a matching update (equivalent to action), store it in the state
+      const update = updateResponse.data;
+      console.log('Update Response:', update);
+      setActionDescription(update.actionDescription);
+      setStatus(update.status);
+    })
+    .catch((err) => {
+      console.error('Error fetching updates:', err);
+    });
     
     toggleModal(); // Close the modal after submission
   

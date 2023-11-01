@@ -62,7 +62,7 @@ const Form = ({isOpen, toggleModal,userId}) => {
         .then(result=>{
             
         console.log('Response:',result.data)
-        navigate('/home')
+        navigate(`/home?userId=${userId}`)
             
         })
         .catch(err=>console.error('Error:',err))

@@ -76,3 +76,36 @@
 .table-container tr:nth-child(even) {
   background-color: rgb(243, 178, 187); /* even row color */
 }
+
+
+/* Add unique card styles in Home.css or a separate CSS file */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  border: none; /* Remove the default border */
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #6e0740; /* Set a background color */
+  color: antiquewhite; /* Text color */
+}
+
+.card:hover {
+  background-color: #250c25; /* Change background color on hover */
+  color: #fff; /* Text color on hover */
+  transform: scale(1.05); /* Add a scaling effect on hover */
+}
+
+.card h5{
+  color:#f0c0e3;
+}
+
+
+
+/* Add other creative styles as needed */
+
+

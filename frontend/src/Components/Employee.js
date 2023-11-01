@@ -28,7 +28,19 @@ const Employee = () => {
         //setComplaints(healthComplaints);
         const departmentComplaints = response.data.filter(complaint=>complaint.department === department)
         
-        setComplaints(departmentComplaints)
+        //setComplaints(departmentComplaints)
+        Promise.all(departmentComplaints.map(complaint => axios.get(`http://localhost:3001/updates/${complaint._id}`)))
+          .then((statusResponses) => {
+            // Combine complaints and their status
+            const complaintsWithStatus = departmentComplaints.map((complaint, index) => ({
+              ...complaint,
+              status: statusResponses[index].data.status,
+            }));
+            setComplaints(complaintsWithStatus);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
         
       
       })
@@ -118,7 +130,7 @@ const Employee = () => {
                 </td>
               <td>
                 <button className="update-button" onClick={()=>handleUpdateModal(complaint._id)} >Update</button>
-                
+                {complaint.status}
               </td>
               {/* Add other fields as needed */}
               
