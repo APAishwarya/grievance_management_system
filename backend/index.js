@@ -38,14 +38,43 @@ const {trainModel, predictDepartment}=require('./complaintClassifier.js')
       // Fetch the corresponding update (equivalent to action) based on complaintId
       const update = await UpdateModel.findOne({ complaintID: complaintID }).exec();
   
-      if (update) {
-        res.json(update);
+    //   if (update) {
+    //     res.json(update);
+    //   } else {
+    //     res.json({ status: "In Progress", actionDescription: "Action Not Taken" });
+    //   }
+    // } 
+    if (update) {
+      const { status, actionDescription, file } = update;
+      res.json({ status, actionDescription, file });
+    } else {
+      res.json({
+        status: "In Progress",
+        actionDescription: "Action Not Taken",
+        file: null,
+      });
+    }
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching updates.' });
+    }
+  });
+
+  app.get('/updates/:complaintId/image', async (req, res) => {
+    const { complaintId } = req.params;
+  
+    try {
+      const update = await UpdateModel.findOne({ complaintID: complaintId }).exec();
+  
+      if (update && update.file) {
+        res.contentType('image/jpeg'); // Adjust the content type as per your actual data type
+        res.send(update.file);
       } else {
-        res.json({ status: "In Progress", actionDescription: "Action Not Taken" });
+        res.status(404).send('Image not found.');
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'An error occurred while fetching updates.' });
+      res.status(500).send('Error fetching the Image.');
     }
   });
   
@@ -92,27 +121,28 @@ app.post('/login',(req,res)=>{
     })
 })
 
+app.post('/', async (req, res) => {
+  const { email } = req.body;
 
-  
+  try {
+      // Check if the user with the provided email already exists
+      const existingUser = await UserModel.findOne({ email: email });
 
+      if (existingUser) {
+          res.json('UserExists');
+      } else {
+          // Create the new user and save it in the database
+          const newUser = await UserModel.create(req.body);
 
+          // Respond with the newly created user, which should contain the special key (e.g., _id)
+          res.json(newUser);
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json('An error occurred while registering.');
+  }
+});
 
-
-app.post('/', (req, res) => {
-    const { email } = req.body;
-
-    UserModel.findOne({ email: email })
-        .then(existingUser => {
-            if (existingUser) {
-                res.json("UserExists");
-            } else {
-                UserModel.create(req.body);
-                
-            }
-        })
-        .then(users=>res.json(users))
-        .catch(err=>res.json(err))
-    })
 
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
