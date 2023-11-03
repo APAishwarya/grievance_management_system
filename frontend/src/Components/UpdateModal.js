@@ -43,6 +43,7 @@ const UpdateModal = ({isOpen, toggleModal, complaintID,userId}) => {
       console.log('Update Response:', update);
       setActionDescription(update.actionDescription);
       setStatus(update.status);
+      setFile(update.file);
     })
     .catch((err) => {
       console.error('Error fetching updates:', err);

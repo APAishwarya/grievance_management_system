@@ -25,27 +25,27 @@ const Home = () => {
         //const healthComplaints = response.data.filter(complaint=>complaint.department === 'Health')
         //setComplaints(healthComplaints);
         const departmentComplaints = response.data.filter(complaint=>complaint.userId === userId);
-         setComplaints(departmentComplaints);
+        setComplaints(departmentComplaints);
          
-         Promise.all(departmentComplaints.map(complaint => {
-          return axios.get(`http://localhost:3001/updates/${complaint._id}`)
-            .then((actionResponse) => {
-              if (actionResponse.data) {
-                // If there is a matching action, store it in the state
-                setComplaintActions(prevActions => ({
-                  ...prevActions,
-                  [complaint._id]: actionResponse.data,
-                }));
-              } else {
-                // If no matching action, set default values
-                setComplaintActions(prevActions => ({
-                  ...prevActions,
-                  [complaint._id]: { status: "In Progress", actionDescription: "Action Not Taken" },
-                }));
-              }
-            });
-        }));
-      })
+        Promise.all(departmentComplaints.map(complaint => {
+         return axios.get(`http://localhost:3001/updates/${complaint._id}`)
+           .then((actionResponse) => {
+             if (actionResponse.data) {
+               // If there is a matching action, store it in the state
+               setComplaintActions(prevActions => ({
+                 ...prevActions,
+                 [complaint._id]: actionResponse.data,
+               }));
+             } else {
+               // If no matching action, set default values
+               setComplaintActions(prevActions => ({
+                 ...prevActions,
+                 [complaint._id]: { status: "In Progress", actionDescription: "Action Not Taken" },
+               }));
+             }
+           });
+       }));
+     })
          
         
       
@@ -113,10 +113,44 @@ const Home = () => {
             <p>{complaint.complaintText}</p>
             <h5>Date</h5>
             <p>{complaint.date}</p>
-            <h5>Status</h5>
+            <h5>Uploaded file</h5>
+            <a href={`http://localhost:3001/complaints/${complaint._id}/image`} target="_blank" rel="noopener noreferrer"> View </a>
+            {/* <h5>Status</h5>
             <p>{complaintActions[complaint._id] ? complaintActions[complaint._id].status : 'In Progress'}</p>
             <h5>Action Description</h5>
-            <p>{complaintActions[complaint._id] ? complaintActions[complaint._id].actionDescription : 'Action Not Taken'}</p>
+            <p>{complaintActions[complaint._id] ? complaintActions[complaint._id].actionDescription : 'Action Not Taken'}</p> */}
+            <br/>
+            <h5>Action File</h5>
+{complaintActions[complaint._id] ? (
+  <div>
+    {complaintActions[complaint._id].file ? (
+    <a
+      href={`http://localhost:3001/updates/${complaint._id}/image`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View Image
+    </a>
+    ):(
+      <p>No Image Uploaded</p>
+    )}
+    <br />
+    <br/>
+    <h5>Status:</h5>
+    <p> {complaintActions[complaint._id].status}</p>
+    <h5>Action Description:</h5>
+    <p> {complaintActions[complaint._id].actionDescription}</p>
+  </div>
+) : (
+  <div>
+    <h5>Status:</h5>
+    <p> In Progress</p>
+    <h5>Action Description:</h5>
+    <p>Action Not Taken</p>
+  </div>
+)}
+            
+            
             {/* Add other fields as needed */}
           </div>
           

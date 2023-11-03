@@ -11,19 +11,34 @@ const Signup = () => {
     const [signupError,setSignupError]= useState()
     const navigate = useNavigate()
 
-    const handleSubmit =(e)=>{
-        e.preventDefault()
-        axios.post('http://localhost:3001/',{name,email,password})
-        .then(result=>{
-            if(result.data === "UserExists"){
-                setSignupError("User already exists!")
-            }else{
-        console.log(result)
-        navigate('/home')
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const user = { name, email, password };
+
+        try {
+            // First, send the user data to the server to save in the database
+            const response = await axios.post('http://localhost:3001/', user);
+
+            if (response.data === 'UserExists') {
+                setSignupError('User already exists!');
+            } else {
+                // After successfully saving the user, get the user data from the response
+                const newUser = response.data;
+
+                // Check if the response contains the special key (e.g., _id)
+                if (newUser && newUser._id) {
+                    // Now, you can navigate to the home page with the special key as a URL parameter
+                    navigate(`/home?userId=${newUser._id}`);
+                } else {
+                    console.error('User data does not contain a valid special key.');
+                }
             }
-        })
-        .catch(err=>console.log(err))
-    }
+        } catch (error) {
+            console.log(error);
+            setSignupError('An error occurred while registering.');
+        }
+    };
   return (
     <>
         <div className='d-flex justify-content-center align-items-center bg-secondary vh-100'>
